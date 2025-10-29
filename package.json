@@ -1,0 +1,28 @@
+{
+  "name": "play",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "scrape": "node scraper.js",
+    "scrape:puppeteer": "node scraper-puppeteer.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "dotenv": "^17.2.3",
+    "playwright": "^1.56.1",
+    "wappalyzer": "^7.0.3"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "cheerio": "^1.1.2",
+    "jsdom": "^27.0.1",
+    "playwright-extra": "^4.3.6",
+    "puppeteer": "^24.26.0",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
