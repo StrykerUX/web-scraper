@@ -1,0 +1,40 @@
+{
+  "pages": [
+    {
+      "name": "anthropic",
+      "url": "https://www.anthropic.com/",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "waitTime": 3000,
+      "selectors": {
+        "title": "h1",
+        "description": "meta[name='description']",
+        "headings": "h2",
+        "mainContent": "main p"
+      }
+    },
+    {
+      "name": "linear",
+      "url": "https://linear.app/",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "waitTime": 3000,
+      "selectors": {
+        "title": "h1",
+        "description": "meta[name='description']",
+        "headings": "h2"
+      }
+    }
+  ],
+  "options": {
+    "headless": true,
+    "maxRetries": 3,
+    "screenshotFormat": "png",
+    "screenshotQuality": 90,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  }
+}
