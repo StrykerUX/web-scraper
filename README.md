@@ -1,281 +1,363 @@
-# Web Scraper con Playwright - Fase 1
+# 🎮 CORTANA - Web Intelligence Scanner
 
-Herramienta de recolección automática de datos web para extraer HTML, screenshots, CSS y metadata de sitios.
+Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión.
 
 ## 🚀 Instalación
 
-Ya completada. Los archivos necesarios están en su lugar.
-
-### Verificar Instalación
 ```bash
-npm --version      # Node.js debe estar instalado
-npx playwright --version  # Debe mostrar v1.56.1 o similar
+# 1. Clonar repositorio
+git clone https://github.com/StrykerUX/web-scraper.git
+cd web-scraper
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Listo para usar
+node cortana https://example.com
 ```
 
-## 📖 Uso Rápido
+## ⚡ Uso Rápido
 
-### Ejecutar Scraper
+### Comando Básico
 ```bash
-npm run scrape https://example.com
+node cortana <url1> <url2> <url3> ...
 ```
 
-### Ejemplos de URLs para Probar
+### Ejemplos
+
 ```bash
-# Sitio estático simple
-npm run scrape https://example.com
+# Escanear un solo sitio
+node cortana https://www.anthropic.com/
 
-# Sitio con React/Next.js
-npm run scrape https://nextjs.org
+# Escanear múltiples sitios
+node cortana https://www.anthropic.com/ https://linear.app/
 
-# Blog/News
-npm run scrape https://github.com
-
-# E-commerce
-npm run scrape https://www.amazon.com
+# Escanear 3 sitios en una sola sesión
+node cortana https://vercel.com/ https://github.com/ https://stripe.com/
 ```
 
-## 📁 Estructura del Proyecto
+### Modo Configuración (Avanzado)
+Si prefieres configurar URLs en un archivo:
 
-```
-play/
-├── scraper.js                 # Script principal de scraping
-├── package.json               # Dependencias y scripts
-├── package-lock.json          # Lock de versiones
-├── PLAN_DE_PRUEBAS.md        # Plan completo de testing
-├── README.md                  # Este archivo
-└── output/                    # Carpeta de resultados (se crea automáticamente)
-    └── 2025-10-21T14-30-45-123/  # Timestamp de ejecución
-        ├── data.json          # Todos los datos extraídos (JSON)
-        ├── summary.json       # Resumen y metadatos
-        ├── classes.json       # Lista de clases CSS
-        ├── page-desktop.html  # HTML completo (versión desktop)
-        ├── page-mobile.html   # HTML completo (versión mobile)
-        ├── screenshot-desktop.png  # Captura 1920x1080
-        └── screenshot-mobile.png   # Captura 375x667
+```bash
+# Edita scraper-config.json con tus URLs
+node cortana
 ```
 
-## 📊 Salida del Scraper
+## 📊 Qué Captura Cortana
 
-### archivo `summary.json` (Resumen Rápido)
+### 🖼️ Screenshots (4 por sitio)
+- **desktop-fullpage.png** - Página completa desktop (1920x1080)
+- **desktop-viewport.png** - Vista inicial desktop
+- **mobile-fullpage.png** - Página completa mobile (375x812)
+- **mobile-viewport.png** - Vista inicial mobile (iPhone)
+
+### 📄 HTML Completo (2 archivos)
+- **page-desktop.html** - Código fuente desktop
+- **page-mobile.html** - Código fuente mobile
+
+### 🎨 Análisis CSS (3 archivos JSON)
+- **classes.json** - Todas las clases CSS del sitio
+- **css-variables.json** - Todas las variables CSS custom properties
+- **computed-styles.json** - Estilos renderizados reales
+
+### 📋 Datos Extraídos
+- **data.json** - Metadata, títulos, descripciones, enlaces
+
+## 📁 Estructura de Salida
+
+```
+output/
+└── anthropic.com-1761788377435/
+    ├── desktop-fullpage.png
+    ├── desktop-viewport.png
+    ├── mobile-fullpage.png
+    ├── mobile-viewport.png
+    ├── page-desktop.html
+    ├── page-mobile.html
+    ├── data.json
+    ├── classes.json
+    ├── css-variables.json
+    └── computed-styles.json
+```
+
+**Total: 10 archivos por sitio**
+
+## 💾 Ejemplo de Archivos Generados
+
+### data.json
 ```json
 {
-  "url": "https://example.com",
-  "scrapedAt": "2025-10-21T14:30:45.123Z",
-  "technologies": {
-    "frameworks": ["react"],
-    "cssFrameworks": ["tailwind"],
-    "libraries": []
+  "metadata": {
+    "title": "Home \\ Anthropic",
+    "url": "https://www.anthropic.com/",
+    "documentHeight": 4334,
+    "captureDate": "2025-10-30T01:32:08.872Z",
+    "loadTime": 26265
   },
-  "confidence": 92,
-  "statistics": {
-    "totalClasses": 156,
-    "totalImages": 23,
-    "totalLinks": 45,
-    "totalForms": 2,
-    "totalHeadings": 8
+  "data": {
+    "title": "AI research and products...",
+    "description": "Anthropic is an AI safety...",
+    "headings": ["Claude Sonnet 4.5", "..."]
   },
-  "files": { ... }
+  "screenshots": {
+    "desktop": {
+      "fullPagePath": ".../desktop-fullpage.png",
+      "viewportPath": ".../desktop-viewport.png"
+    },
+    "mobile": {
+      "fullPagePath": ".../mobile-fullpage.png",
+      "viewportPath": ".../mobile-viewport.png"
+    }
+  }
 }
 ```
 
-### archivo `data.json` (Datos Completos)
-Contiene:
-- **html.desktop** / **html.mobile** - HTML completo renderizado
-- **css.classes** - Array de todas las clases CSS
-- **images** - Lista de imágenes con src, alt, dimensiones
-- **links** - Lista de enlaces (máx 50)
-- **forms** - Estructura de formularios
-- **headings** - Títulos/encabezados
-- **metadata** - URL, timestamp, tecnologías detectadas
-- **confidence** - Score 0-100 de qué tan completo es el scrape
+### classes.json
+```json
+[
+  "animate-space",
+  "btn_main_wrap",
+  "card",
+  "footer_contain",
+  "nav_link",
+  ...
+]
+```
 
-### archivo `classes.json`
+### css-variables.json
 ```json
 {
-  "total": 156,
-  "classes": [
-    "container",
-    "flex",
-    "justify-center",
-    "text-lg",
-    "bg-slate-900",
-    ...
-  ]
+  "--swatch--clay": "#d97757",
+  "--site--max-width": "min(100rem, 100vw)",
+  "--size--2rem": "clamp(1.75rem, 1.67vw, 2rem)",
+  ...
 }
 ```
 
-## 🧪 Pruebas
+### computed-styles.json
+```json
+{
+  "body": {
+    "backgroundColor": "rgb(250, 249, 245)",
+    "color": "rgb(20, 20, 19)",
+    "fontFamily": "\"ABC Favorit\", sans-serif",
+    "fontSize": "18px",
+    "lineHeight": "27px"
+  },
+  "main": {
+    "maxWidth": "...",
+    "padding": "..."
+  }
+}
+```
 
-Ver documento completo: [`PLAN_DE_PRUEBAS.md`](./PLAN_DE_PRUEBAS.md)
+## ⚙️ Características Técnicas
 
-### Test Rápido
+### 🔒 Carga Garantizada
+Cortana asegura que TODO esté cargado antes de capturar:
+- ✅ Network Idle (sin requests pendientes)
+- ✅ Fonts cargadas (`document.fonts.ready`)
+- ✅ Lazy loading detectado y forzado
+- ✅ Scroll completo automático
+- ✅ 3 segundos adicionales de espera
+- ✅ 3 reintentos automáticos si falla
+
+### 📱 Viewports Configurados
+- **Desktop:** 1920x1080 + Chrome user agent
+- **Mobile:** 375x812 (iPhone) + Safari user agent
+
+### ⏱️ Performance
+- **1 sitio:** ~26 segundos (10 archivos)
+- **2 sitios:** ~53 segundos (20 archivos)
+- **3 sitios:** ~80 segundos (30 archivos)
+
+## 🎯 Casos de Uso
+
+### 1. Design-to-Code
 ```bash
-# Probar con example.com (sitio simple)
-npm run scrape https://example.com
+# Captura sitio para replicar
+node cortana https://ejemplo.com/
 
-# Verificar que se creó la carpeta output/
-ls -la output/
-
-# Ver el resumen
-cat output/*/summary.json | jq .
+# Usa los archivos HTML y CSS para análisis
+# classes.json te da los nombres de clases
+# css-variables.json te da el design system
 ```
 
-### Validar Salida
+### 2. Análisis Competitivo
 ```bash
-# Contar clases CSS extraídas
-jq '.css.classes | length' output/*/data.json
+# Captura múltiples competidores
+node cortana https://competidor1.com/ https://competidor2.com/ https://competidor3.com/
 
-# Ver tecnologías detectadas
-jq '.metadata.technologies' output/*/data.json
-
-# Listar archivos generados
-ls -lh output/*/
+# Compara estructuras HTML y CSS entre sitios
 ```
 
-## ⚙️ Configuración
+### 3. Responsive Testing
+```bash
+# Una ejecución captura ambas versiones
+node cortana https://tusitio.com/
 
-### Viewport Predeterminado
-- **Desktop:** 1920x1080 (usuario con monitor grande)
-- **Mobile:** 375x667 (iPhone SE)
-
-Para cambiar, editar `scraper.js` líneas ~140 y ~170.
-
-### Timeout
-Predeterminado: **30 segundos** por página
-
-Para sitios lentos, cambiar en `scraper.js` línea ~165:
-```javascript
-// Cambiar de:
-timeout: 30000,
-// A:
-timeout: 60000, // 60 segundos
+# Compara page-desktop.html vs page-mobile.html
+# Compara screenshots side-by-side
 ```
 
-### User-Agent
-Por defecto emula navegadores reales para evitar bloqueos.
+### 4. Design System Extraction
+```bash
+node cortana https://ejemplo.com/
 
-Editar en `scraper.js` líneas ~142 (desktop) y ~172 (mobile).
+# Analiza:
+# - css-variables.json (colores, spacing, etc.)
+# - classes.json (naming conventions)
+# - computed-styles.json (valores reales renderizados)
+```
 
-## 🔍 Detección de Tecnologías
+## 🔧 Configuración Avanzada
 
-El script detecta automáticamente:
-- **Frameworks:** React, Vue, Angular, Svelte, Next.js, Nuxt
-- **CSS:** Tailwind, Bootstrap
-- **Método:** Analiza URLs de scripts y contenido HTML
+### scraper-config.json
+Para uso recurrente de las mismas URLs:
 
-Para ampliar detecciones, editar función `detectTechnologies()` en `scraper.js`.
+```json
+{
+  "pages": [
+    {
+      "name": "mi-sitio",
+      "url": "https://ejemplo.com",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "waitTime": 3000,
+      "selectors": {
+        "title": "h1",
+        "description": "meta[name='description']",
+        "headings": "h2"
+      }
+    }
+  ],
+  "options": {
+    "headless": true,
+    "maxRetries": 3,
+    "screenshotFormat": "png"
+  }
+}
+```
+
+Luego ejecuta sin argumentos:
+```bash
+node cortana
+```
+
+## 📊 Resumen de Ejecución
+
+Al finalizar, Cortana muestra un resumen:
+
+```
+============================================================
+SCRAPING SUMMARY
+============================================================
+Total time: 26.86s
+Pages processed: 1
+Successful: 1
+Failed: 0
+
+Files per page:
+  - 4 screenshots (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)
+  - 2 HTML files (page-desktop.html, page-mobile.html)
+  - 4 JSON files (data.json, classes.json, css-variables.json, computed-styles.json)
+============================================================
+
+✅ anthropic.com-1761788377435 - https://www.anthropic.com/
+   Time: 26.17s
+
+✅ Mission complete. Cortana out.
+```
 
 ## ❌ Solución de Problemas
 
-### Error: "Playwright not installed"
+### Error: "No URLs provided"
+```bash
+# ❌ Incorrecto
+node cortana
+
+# ✅ Correcto
+node cortana https://ejemplo.com
+```
+
+### Error: "Navigation timeout"
+El sitio es muy lento o tiene protección anti-bot.
+- Intenta con otro sitio primero para verificar que Cortana funcione
+- Algunos sitios bloquean bots (normal)
+
+### Error: "puppeteer not found"
 ```bash
 npm install
-npx playwright install
 ```
 
-### Error: "Browser launch failed"
-**En Linux**, instalar dependencias:
+### Screenshots salen incompletos
+Esto NO debería pasar con Cortana. Si pasa:
+- Reporta el issue con la URL problemática
+- Cortana tiene múltiples estrategias de carga garantizada
+
+### Carpeta output/ vacía
+Revisa los errores en consola. Cortana muestra mensajes detallados de cada paso.
+
+## 🛡️ Consideraciones Legales
+
+⚠️ **Uso Responsable:**
+- Respeta `robots.txt`
+- No uses para copiar contenido protegido sin permiso
+- No hagas scraping masivo (cientos de URLs)
+- Usa para análisis, aprendizaje, o con autorización
+
+ℹ️ **Privacidad:**
+- Todos los datos se guardan localmente en `/output/`
+- No se envía nada a servidores externos
+- Tú controlas todos los archivos generados
+
+## 💡 Tips Pro
+
+### Ver clases CSS más usadas
 ```bash
-npx playwright install-deps
-# O manualmente:
-sudo apt-get install libasound2t64
+jq '.' output/*/classes.json | head -20
 ```
 
-### Error: "Timeout waiting for..."
-- Sitio es muy lento (aumentar timeout)
-- Requiere autenticación (no soportado aún)
-- URL bloqueada (usa anti-bot)
-
-**Solución:** Aumentar timeout en configuración o usar URL diferente.
-
-### Error: "Invalid URL"
+### Contar variables CSS
 ```bash
-# Incorrecto:
-npm run scrape example.com
-
-# Correcto:
-npm run scrape https://example.com
-npm run scrape http://example.com
+jq 'length' output/*/css-variables.json
 ```
 
-### La carpeta `output/` está vacía
-Revisar si hubo errores en los logs. El script imprime mensajes detallados.
+### Extraer solo colores de variables CSS
+```bash
+jq 'to_entries | map(select(.value | contains("#")))' output/*/css-variables.json
+```
 
-## 📈 Siguientes Pasos (Fase 2 y 3)
+### Comparar mobile vs desktop HTML
+```bash
+wc -l output/*/page-*.html
+diff output/*/page-desktop.html output/*/page-mobile.html
+```
 
-Una vez tengas los datos extraídos en `data.json`:
+## 🚀 Próximas Características
 
-1. **Fase 2:** Pasar los datos a Claude Code para generar código
-   - Usar el JSON como entrada al prompt
-   - Especificar framework destino (Next.js, React, etc.)
-
-2. **Fase 3:** QA automático
-   - Comparar screenshots original vs generado
-   - Validar CSS con linters
-   - Ejecutar tests
-
-## 📝 Notas Importantes
-
-- ⚠️ **Respeto Legal:** No usar para copiar contenido protegido sin permiso
-- ⚠️ **Anti-bot:** Algunos sitios bloquean scrapers. Respetar `robots.txt`
-- ⚠️ **Rate Limiting:** No hacer cientos de requests simultáneos
-- ℹ️ **Confidencialidad:** Los datos se guardan localmente en `output/`
-
-## 🛠️ Personalización
-
-### Agregar Más Metadatos
-Editar `extractPageInfo()` en `scraper.js` para extraer:
-- Meta tags
-- Open Graph (og:)
-- JSON-LD structured data
-- CSS custom properties (variables)
-
-### Cambiar Formato de Salida
-Por defecto: JSON. Posibles extensiones:
-- CSV (para clases CSS)
-- ZIP (comprimir todo)
-- Base64 (para pasar a Claude)
-
-## 💡 Tips
-
-1. **Verificar salida HTML:**
-   ```bash
-   file output/*/page-desktop.html
-   wc -l output/*/page-desktop.html
-   ```
-
-2. **Ver clases CSS únicas:**
-   ```bash
-   jq '.css.classes[:20]' output/*/data.json  # Primeras 20
-   ```
-
-3. **Contar elementos:**
-   ```bash
-   jq '.images | length' output/*/data.json
-   jq '.links | length' output/*/data.json
-   ```
-
-4. **Verificar confidence:**
-   ```bash
-   jq '.confidence' output/*/summary.json
-   ```
+- [ ] PDF export
+- [ ] Lighthouse scores
+- [ ] Accessibility audit
+- [ ] Performance metrics
+- [ ] SEO analysis
+- [ ] Screenshot comparison diff
 
 ## 📚 Referencias
 
-- [Playwright Documentation](https://playwright.dev)
-- [Plan de Pruebas Completo](./PLAN_DE_PRUEBAS.md)
-- [Documento de Propuesta Original](../Sugerencia%20de%20herramientas%20extra.pdf)
+- **Repositorio:** [github.com/StrykerUX/web-scraper](https://github.com/StrykerUX/web-scraper)
+- **Puppeteer Docs:** [pptr.dev](https://pptr.dev)
 
-## 📞 Soporte
+## 🎮 Sobre Cortana
 
-Si algo no funciona:
-1. Revisar [`PLAN_DE_PRUEBAS.md`](./PLAN_DE_PRUEBAS.md) para tu caso de uso
-2. Ejecutar con una URL conocida (example.com)
-3. Revisar los logs completos en consola
-4. Verificar conectividad a internet
+Cortana es tu asistente de inteligencia web. Escanea, captura y documenta sitios web de forma automática y confiable.
 
 ---
 
-**Versión:** 1.0
-**Creado:** 2025-10-21
-**Estado:** ✅ Listo para usar
+**Versión:** 2.0
+**Estado:** ✅ Production Ready
+**Última actualización:** 2025-10-30
+**By:** StrykerUX Team

@@ -454,7 +454,7 @@ function parseCommandLineArgs() {
 // Main function
 async function main() {
     const startTime = Date.now();
-    console.log('\n🚀 Multi-Page Web Scraper Starting...\n');
+    console.log('\n🎮 CORTANA - Web Intelligence Scanner\n');
 
     // Try to get pages from command line arguments first
     let pages = parseCommandLineArgs();
@@ -476,11 +476,11 @@ async function main() {
             console.log(`✓ Configuration loaded from file: ${pages.length} page(s) to scrape\n`);
         } catch (error) {
             console.error('❌ Error: No URLs provided and could not load configuration file.');
-            console.log('\nUsage:');
-            console.log('  node scraper-multi-page.js <url1> <url2> ...');
+            console.log('\n💡 Usage:');
+            console.log('  node cortana <url1> <url2> ...');
             console.log('  or have a scraper-config.json file in the same directory\n');
-            console.log('Example:');
-            console.log('  node scraper-multi-page.js https://example.com https://google.com\n');
+            console.log('📝 Example:');
+            console.log('  node cortana https://example.com https://google.com\n');
             process.exit(1);
         }
     } else {
@@ -558,7 +558,7 @@ async function main() {
         }
     });
 
-    console.log('\n🎉 Scraping completed!\n');
+    console.log('\n✅ Mission complete. Cortana out.\n');
 }
 
 // Run the scraper
