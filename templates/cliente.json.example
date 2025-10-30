@@ -1,0 +1,64 @@
+{
+  "nombre": "Restaurante El Buen Sabor",
+  "industria": "Restaurante / Gastronomía",
+  "url_actual": "https://ejemplo-restaurante.com",
+  "descripcion_negocio": "Restaurante gourmet especializado en cocina fusión, con 15 años de experiencia y reconocimientos internacionales.",
+  "audiencia_objetivo": "Familias de nivel socioeconómico medio-alto, profesionistas jóvenes, turistas gastronómicos",
+  "objetivos_sitio": [
+    "Aumentar reservaciones online en 40%",
+    "Mostrar menú actualizado y especiales del chef",
+    "Generar engagement en redes sociales",
+    "Facilitar pedidos para llevar"
+  ],
+  "colores_marca": {
+    "primario": "#FF6B35",
+    "secundario": "#004E89",
+    "acento": "#F7F7F7",
+    "texto": "#1A1A1A"
+  },
+  "tipografia": {
+    "headings": "Playfair Display",
+    "body": "Inter"
+  },
+  "cta_principal": "Reservar Mesa",
+  "cta_secundario": "Ver Menú",
+  "secciones_requeridas": [
+    "hero",
+    "sobre_nosotros",
+    "menu_destacado",
+    "galeria",
+    "testimonios",
+    "reservaciones",
+    "contacto",
+    "footer"
+  ],
+  "funcionalidades_especiales": [
+    "Sistema de reservaciones integrado",
+    "Menú digital interactivo",
+    "Galería de platos con lightbox",
+    "Integración con Google Maps",
+    "Newsletter signup"
+  ],
+  "animaciones": true,
+  "smooth_scrolling": true,
+  "idioma_principal": "es-MX",
+  "idiomas_adicionales": ["en"],
+  "redes_sociales": {
+    "facebook": "https://facebook.com/restaurante",
+    "instagram": "https://instagram.com/restaurante",
+    "twitter": "https://twitter.com/restaurante"
+  },
+  "informacion_contacto": {
+    "telefono": "+52 55 1234 5678",
+    "email": "contacto@restaurante.com",
+    "direccion": "Av. Reforma 123, CDMX",
+    "horario": "Mar-Dom 1pm-11pm"
+  },
+  "seo_keywords": [
+    "restaurante gourmet",
+    "cocina fusión",
+    "mejor restaurante CDMX",
+    "reservaciones restaurante"
+  ],
+  "notas_adicionales": "Priorizar experiencia mobile. El 65% de nuestro tráfico viene de dispositivos móviles. Implementar lazy loading para imágenes de alta calidad del menú."
+}

@@ -1,0 +1,197 @@
+{
+  "timestamp": "20251030_143015",
+  "runFolder": "fetch-results/20251030_143015",
+  "date": "2025-10-30T14:30:15.234Z",
+  "url1": "https://foody-onepage.webflow.io/",
+  "url2": "https://restaurante-template.webflow.io/",
+  "title1": "Foody - Delicious Food Delivered Fast",
+  "title2": "Restaurante Gourmet - Fine Dining Experience",
+  "topHeadings1": [
+    {
+      "tag": "h1",
+      "text": "Fresh Food, Fast Delivery",
+      "classes": "hero-title text-center"
+    },
+    {
+      "tag": "h2",
+      "text": "Our Menu",
+      "classes": "section-heading"
+    },
+    {
+      "tag": "h2",
+      "text": "Why Choose Us",
+      "classes": "section-heading"
+    },
+    {
+      "tag": "h3",
+      "text": "Fresh Ingredients",
+      "classes": "feature-title"
+    }
+  ],
+  "topHeadings2": [
+    {
+      "tag": "h1",
+      "text": "Experience Fine Dining",
+      "classes": "hero-main"
+    },
+    {
+      "tag": "h2",
+      "text": "Chef's Specials",
+      "classes": "menu-title"
+    },
+    {
+      "tag": "h2",
+      "text": "Our Story",
+      "classes": "about-heading"
+    },
+    {
+      "tag": "h3",
+      "text": "Book Your Table",
+      "classes": "cta-title"
+    }
+  ],
+  "imgs1": [
+    {
+      "src": "https://cdn.webflow.io/images/hero-burger-large.jpg",
+      "alt": "Gourmet Burger with Fresh Ingredients",
+      "w": 1920,
+      "h": 1080
+    },
+    {
+      "src": "https://cdn.webflow.io/images/pizza-margherita.jpg",
+      "alt": "Classic Margherita Pizza",
+      "w": 1600,
+      "h": 900
+    },
+    {
+      "src": "https://cdn.webflow.io/images/salad-bowl.jpg",
+      "alt": "Fresh Garden Salad",
+      "w": 1400,
+      "h": 800
+    },
+    {
+      "src": "https://cdn.webflow.io/images/delivery-team.jpg",
+      "alt": "Our Delivery Team",
+      "w": 1200,
+      "h": 800
+    }
+  ],
+  "imgs2": [
+    {
+      "src": "https://cdn.webflow.io/images/restaurant-interior-elegant.jpg",
+      "alt": "Elegant Restaurant Interior",
+      "w": 1920,
+      "h": 1280
+    },
+    {
+      "src": "https://cdn.webflow.io/images/chef-preparing-dish.jpg",
+      "alt": "Chef Preparing Signature Dish",
+      "w": 1600,
+      "h": 1200
+    },
+    {
+      "src": "https://cdn.webflow.io/images/wine-selection.jpg",
+      "alt": "Fine Wine Selection",
+      "w": 1400,
+      "h": 900
+    },
+    {
+      "src": "https://cdn.webflow.io/images/plated-dessert.jpg",
+      "alt": "Gourmet Dessert Plating",
+      "w": 1200,
+      "h": 800
+    }
+  ],
+  "sections1": [
+    {
+      "tag": "section",
+      "id": "hero",
+      "heading": "Fresh Food, Fast Delivery",
+      "classes": "hero-section bg-gradient",
+      "area": 2073600
+    },
+    {
+      "tag": "section",
+      "id": "menu",
+      "heading": "Our Menu",
+      "classes": "menu-section container",
+      "area": 1536000
+    },
+    {
+      "tag": "section",
+      "id": "features",
+      "heading": "Why Choose Us",
+      "classes": "features-section",
+      "area": 1228800
+    },
+    {
+      "tag": "section",
+      "id": "testimonials",
+      "heading": null,
+      "classes": "testimonials-section bg-light",
+      "area": 921600
+    },
+    {
+      "tag": "footer",
+      "id": null,
+      "heading": null,
+      "classes": "site-footer",
+      "area": 614400
+    }
+  ],
+  "sections2": [
+    {
+      "tag": "section",
+      "id": "hero",
+      "heading": "Experience Fine Dining",
+      "classes": "hero-main parallax-bg",
+      "area": 1843200
+    },
+    {
+      "tag": "section",
+      "id": "about",
+      "heading": "Our Story",
+      "classes": "about-section container-fluid",
+      "area": 1382400
+    },
+    {
+      "tag": "section",
+      "id": "specials",
+      "heading": "Chef's Specials",
+      "classes": "menu-specials-section",
+      "area": 1305600
+    },
+    {
+      "tag": "section",
+      "id": "gallery",
+      "heading": null,
+      "classes": "photo-gallery masonry",
+      "area": 1228800
+    },
+    {
+      "tag": "section",
+      "id": "reservations",
+      "heading": "Book Your Table",
+      "classes": "booking-section",
+      "area": 1152000
+    }
+  ],
+  "clientData": {
+    "nombre": "Restaurante El Buen Sabor",
+    "industria": "Restaurante / Gastronomía",
+    "colores_marca": ["#FF6B35", "#004E89", "#F7F7F7"],
+    "cta_principal": "Reservar Mesa",
+    "secciones_requeridas": ["hero", "menu", "galeria", "testimonios", "contacto"],
+    "animaciones": true,
+    "idioma": "es-MX"
+  },
+  "recommendedComponents": [
+    "header",
+    "footer",
+    "hero",
+    "gallery",
+    "contact_form",
+    "testimonials",
+    "menu_grid"
+  ]
+}
