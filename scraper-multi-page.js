@@ -149,13 +149,69 @@ async function extractData(page, selectors) {
     return data;
 }
 
-// Function to capture screenshots for a specific device type
-async function captureScreenshots(page, outputDir, deviceType) {
-    const deviceDir = path.join(outputDir, deviceType);
-    await ensureDir(deviceDir);
+// Function to extract CSS information
+async function extractCSSInfo(page) {
+    return await page.evaluate(() => {
+        // Extract all unique classes
+        const allElements = document.querySelectorAll('*');
+        const classes = new Set();
+        allElements.forEach(el => {
+            if (el.className && typeof el.className === 'string') {
+                el.className.split(' ').forEach(cls => {
+                    if (cls.trim()) classes.add(cls.trim());
+                });
+            }
+        });
+
+        // Extract CSS variables from :root
+        const rootStyles = getComputedStyle(document.documentElement);
+        const cssVariables = {};
+        for (let i = 0; i < rootStyles.length; i++) {
+            const prop = rootStyles[i];
+            if (prop.startsWith('--')) {
+                cssVariables[prop] = rootStyles.getPropertyValue(prop).trim();
+            }
+        }
+
+        // Extract computed styles from body and main elements
+        const bodyStyles = getComputedStyle(document.body);
+        const mainElement = document.querySelector('main') || document.body;
+        const mainStyles = getComputedStyle(mainElement);
+
+        const computedStyles = {
+            body: {
+                backgroundColor: bodyStyles.backgroundColor,
+                color: bodyStyles.color,
+                fontFamily: bodyStyles.fontFamily,
+                fontSize: bodyStyles.fontSize,
+                lineHeight: bodyStyles.lineHeight
+            },
+            main: {
+                backgroundColor: mainStyles.backgroundColor,
+                color: mainStyles.color,
+                fontFamily: mainStyles.fontFamily,
+                fontSize: mainStyles.fontSize,
+                lineHeight: mainStyles.lineHeight,
+                maxWidth: mainStyles.maxWidth,
+                padding: mainStyles.padding,
+                margin: mainStyles.margin
+            }
+        };
+
+        return {
+            classes: Array.from(classes).sort(),
+            cssVariables,
+            computedStyles
+        };
+    });
+}
+
+// Function to capture and save page data for a specific device
+async function capturePageData(page, outputDir, deviceType) {
+    const prefix = `${deviceType}-`;
 
     // Take full page screenshot
-    const fullPagePath = path.join(deviceDir, 'fullpage.png');
+    const fullPagePath = path.join(outputDir, `${prefix}fullpage.png`);
     console.log(`📸 Capturing ${deviceType} full page screenshot...`);
     await page.screenshot({
         path: fullPagePath,
@@ -169,7 +225,7 @@ async function captureScreenshots(page, outputDir, deviceType) {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Take viewport screenshot
-    const viewportPath = path.join(deviceDir, 'viewport.png');
+    const viewportPath = path.join(outputDir, `${prefix}viewport.png`);
     console.log(`📸 Capturing ${deviceType} viewport screenshot...`);
     await page.screenshot({
         path: viewportPath,
@@ -178,9 +234,17 @@ async function captureScreenshots(page, outputDir, deviceType) {
     });
     console.log(`✓ ${deviceType} viewport screenshot saved`);
 
+    // Save HTML
+    const htmlPath = path.join(outputDir, `page-${deviceType}.html`);
+    console.log(`💾 Saving ${deviceType} HTML...`);
+    const html = await page.content();
+    await fs.writeFile(htmlPath, html);
+    console.log(`✓ ${deviceType} HTML saved`);
+
     return {
         fullPagePath,
-        viewportPath
+        viewportPath,
+        htmlPath
     };
 }
 
@@ -200,7 +264,8 @@ async function scrapePage(browser, pageConfig, options) {
         desktop: null,
         mobile: null,
         data: null,
-        metadata: null
+        metadata: null,
+        cssInfo: null
     };
 
     // Scrape for both desktop and mobile
@@ -255,9 +320,9 @@ async function scrapePage(browser, pageConfig, options) {
 
             console.log('✓ All resources loaded, starting capture...\n');
 
-            // Capture screenshots
-            const screenshots = await captureScreenshots(page, outputDir, deviceType);
-            results[deviceType] = screenshots;
+            // Capture screenshots and HTML
+            const captureData = await capturePageData(page, outputDir, deviceType);
+            results[deviceType] = captureData;
 
             // Extract data (only once for desktop)
             if (deviceType === 'desktop' && pageConfig.selectors) {
@@ -266,6 +331,13 @@ async function scrapePage(browser, pageConfig, options) {
                 if (results.data) {
                     console.log(`✓ Data extracted (${Object.keys(results.data).length} fields)`);
                 }
+            }
+
+            // Extract CSS info (only once for desktop)
+            if (deviceType === 'desktop') {
+                console.log('\n🎨 Extracting CSS information...');
+                results.cssInfo = await extractCSSInfo(page);
+                console.log(`✓ CSS info extracted (${results.cssInfo.classes.length} classes, ${Object.keys(results.cssInfo.cssVariables).length} variables)`);
             }
 
             // Get page metadata (only once for desktop)
@@ -285,7 +357,10 @@ async function scrapePage(browser, pageConfig, options) {
         }
     }
 
-    // Save data to JSON
+    // Save all JSON files
+    console.log('\n💾 Saving analysis files...');
+
+    // Main data.json
     const dataPath = path.join(outputDir, 'data.json');
     const outputData = {
         metadata: {
@@ -299,9 +374,29 @@ async function scrapePage(browser, pageConfig, options) {
             mobile: results.mobile
         }
     };
-
     await fs.writeFile(dataPath, JSON.stringify(outputData, null, 2));
-    console.log(`\n✓ Data saved: ${dataPath}`);
+    console.log('✓ data.json saved');
+
+    // classes.json
+    if (results.cssInfo && results.cssInfo.classes) {
+        const classesPath = path.join(outputDir, 'classes.json');
+        await fs.writeFile(classesPath, JSON.stringify(results.cssInfo.classes, null, 2));
+        console.log('✓ classes.json saved');
+    }
+
+    // css-variables.json
+    if (results.cssInfo && results.cssInfo.cssVariables) {
+        const cssVarsPath = path.join(outputDir, 'css-variables.json');
+        await fs.writeFile(cssVarsPath, JSON.stringify(results.cssInfo.cssVariables, null, 2));
+        console.log('✓ css-variables.json saved');
+    }
+
+    // computed-styles.json
+    if (results.cssInfo && results.cssInfo.computedStyles) {
+        const computedStylesPath = path.join(outputDir, 'computed-styles.json');
+        await fs.writeFile(computedStylesPath, JSON.stringify(results.cssInfo.computedStyles, null, 2));
+        console.log('✓ computed-styles.json saved');
+    }
 
     const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(`\n✅ Successfully scraped ${pageConfig.name} in ${totalTime}s`);
@@ -447,7 +542,10 @@ async function main() {
     console.log(`Pages processed: ${results.length}`);
     console.log(`Successful: ${results.filter(r => r.success).length}`);
     console.log(`Failed: ${results.filter(r => !r.success).length}`);
-    console.log(`Screenshots per page: 4 (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)`);
+    console.log(`\nFiles per page:`);
+    console.log(`  - 4 screenshots (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)`);
+    console.log(`  - 2 HTML files (page-desktop.html, page-mobile.html)`);
+    console.log(`  - 4 JSON files (data.json, classes.json, css-variables.json, computed-styles.json)`);
     console.log(`${'='.repeat(60)}\n`);
 
     results.forEach(result => {
