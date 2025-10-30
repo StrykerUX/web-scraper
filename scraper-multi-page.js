@@ -2,6 +2,20 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
 
+// Viewport configurations
+const VIEWPORTS = {
+    desktop: {
+        width: 1920,
+        height: 1080,
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    },
+    mobile: {
+        width: 375,
+        height: 812,
+        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+    }
+};
+
 // Utility function to ensure directory exists
 async function ensureDir(dirPath) {
     try {
@@ -77,6 +91,10 @@ async function scrollToBottom(page) {
 
 // Function to extract data based on selectors
 async function extractData(page, selectors) {
+    if (!selectors || Object.keys(selectors).length === 0) {
+        return null;
+    }
+
     const data = {};
 
     for (const [key, selector] of Object.entries(selectors)) {
@@ -131,6 +149,41 @@ async function extractData(page, selectors) {
     return data;
 }
 
+// Function to capture screenshots for a specific device type
+async function captureScreenshots(page, outputDir, deviceType) {
+    const deviceDir = path.join(outputDir, deviceType);
+    await ensureDir(deviceDir);
+
+    // Take full page screenshot
+    const fullPagePath = path.join(deviceDir, 'fullpage.png');
+    console.log(`📸 Capturing ${deviceType} full page screenshot...`);
+    await page.screenshot({
+        path: fullPagePath,
+        fullPage: true,
+        type: 'png'
+    });
+    console.log(`✓ ${deviceType} full page screenshot saved`);
+
+    // Scroll back to top for viewport screenshot
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Take viewport screenshot
+    const viewportPath = path.join(deviceDir, 'viewport.png');
+    console.log(`📸 Capturing ${deviceType} viewport screenshot...`);
+    await page.screenshot({
+        path: viewportPath,
+        fullPage: false,
+        type: 'png'
+    });
+    console.log(`✓ ${deviceType} viewport screenshot saved`);
+
+    return {
+        fullPagePath,
+        viewportPath
+    };
+}
+
 // Main scraping function for a single page
 async function scrapePage(browser, pageConfig, options) {
     const startTime = Date.now();
@@ -139,128 +192,168 @@ async function scrapePage(browser, pageConfig, options) {
     console.log(`URL: ${pageConfig.url}`);
     console.log(`${'='.repeat(60)}\n`);
 
-    const page = await browser.newPage();
+    // Create output directory
+    const outputDir = path.join(__dirname, 'output', pageConfig.name);
+    await ensureDir(outputDir);
 
-    try {
-        // Set viewport
-        await page.setViewport(pageConfig.viewport);
+    const results = {
+        desktop: null,
+        mobile: null,
+        data: null,
+        metadata: null
+    };
 
-        // Set user agent if provided
-        if (options.userAgent) {
-            await page.setUserAgent(options.userAgent);
+    // Scrape for both desktop and mobile
+    for (const [deviceType, viewport] of Object.entries(VIEWPORTS)) {
+        console.log(`\n📱 Processing ${deviceType.toUpperCase()} version...\n`);
+
+        const page = await browser.newPage();
+
+        try {
+            // Set viewport and user agent
+            await page.setViewport({
+                width: viewport.width,
+                height: viewport.height
+            });
+            await page.setUserAgent(viewport.userAgent);
+
+            console.log(`⏳ Navigating to page (${viewport.width}x${viewport.height})...`);
+
+            // Navigate with network idle wait
+            await page.goto(pageConfig.url, {
+                waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
+                timeout: 90000
+            });
+
+            console.log('✓ Page loaded, ensuring all resources are ready...');
+
+            // Wait for fonts
+            console.log('⏳ Waiting for fonts...');
+            await waitForFonts(page);
+            console.log('✓ Fonts loaded');
+
+            // Scroll to bottom to trigger any lazy loading
+            console.log('⏳ Scrolling page to trigger lazy loading...');
+            await scrollToBottom(page);
+            console.log('✓ Page scrolled');
+
+            // Wait for lazy images
+            console.log('⏳ Waiting for lazy-loaded images...');
+            await waitForLazyImages(page);
+            console.log('✓ Images loaded');
+
+            // Additional wait time
+            const waitTime = pageConfig.waitTime || 3000;
+            console.log(`⏳ Additional wait time: ${waitTime}ms...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+
+            // Final network idle check
+            console.log('⏳ Final network idle check...');
+            await page.waitForNetworkIdle({ timeout: 5000 }).catch(() => {
+                console.log('⚠ Network not completely idle, continuing anyway...');
+            });
+
+            console.log('✓ All resources loaded, starting capture...\n');
+
+            // Capture screenshots
+            const screenshots = await captureScreenshots(page, outputDir, deviceType);
+            results[deviceType] = screenshots;
+
+            // Extract data (only once for desktop)
+            if (deviceType === 'desktop' && pageConfig.selectors) {
+                console.log('\n📊 Extracting data...');
+                results.data = await extractData(page, pageConfig.selectors);
+                if (results.data) {
+                    console.log(`✓ Data extracted (${Object.keys(results.data).length} fields)`);
+                }
+            }
+
+            // Get page metadata (only once for desktop)
+            if (deviceType === 'desktop') {
+                results.metadata = await page.evaluate(() => ({
+                    title: document.title,
+                    url: window.location.href,
+                    documentHeight: document.body.scrollHeight
+                }));
+            }
+
+        } catch (error) {
+            console.error(`\n❌ Error scraping ${deviceType} version:`, error.message);
+            results[deviceType] = { error: error.message };
+        } finally {
+            await page.close();
         }
-
-        console.log('⏳ Navigating to page...');
-
-        // Navigate with network idle wait
-        await page.goto(pageConfig.url, {
-            waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
-            timeout: 90000
-        });
-
-        console.log('✓ Page loaded, ensuring all resources are ready...');
-
-        // Wait for fonts
-        console.log('⏳ Waiting for fonts...');
-        await waitForFonts(page);
-        console.log('✓ Fonts loaded');
-
-        // Scroll to bottom to trigger any lazy loading
-        console.log('⏳ Scrolling page to trigger lazy loading...');
-        await scrollToBottom(page);
-        console.log('✓ Page scrolled');
-
-        // Wait for lazy images
-        console.log('⏳ Waiting for lazy-loaded images...');
-        await waitForLazyImages(page);
-        console.log('✓ Images loaded');
-
-        // Additional wait time specified in config
-        if (pageConfig.waitTime) {
-            console.log(`⏳ Additional wait time: ${pageConfig.waitTime}ms...`);
-            await new Promise(resolve => setTimeout(resolve, pageConfig.waitTime));
-        }
-
-        // Final network idle check
-        console.log('⏳ Final network idle check...');
-        await page.waitForNetworkIdle({ timeout: 5000 }).catch(() => {
-            console.log('⚠ Network not completely idle, continuing anyway...');
-        });
-
-        console.log('✓ All resources loaded, starting capture...\n');
-
-        // Create output directory
-        const outputDir = path.join(__dirname, 'output', pageConfig.name);
-        await ensureDir(outputDir);
-
-        // Take full page screenshot
-        const fullPagePath = path.join(outputDir, 'fullpage.png');
-        console.log('📸 Capturing full page screenshot...');
-        await page.screenshot({
-            path: fullPagePath,
-            fullPage: true,
-            type: options.screenshotFormat || 'png'
-        });
-        console.log(`✓ Full page screenshot saved: ${fullPagePath}`);
-
-        // Scroll back to top for viewport screenshot
-        await page.evaluate(() => window.scrollTo(0, 0));
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Take viewport screenshot
-        const viewportPath = path.join(outputDir, 'viewport.png');
-        console.log('📸 Capturing viewport screenshot...');
-        await page.screenshot({
-            path: viewportPath,
-            fullPage: false,
-            type: options.screenshotFormat || 'png'
-        });
-        console.log(`✓ Viewport screenshot saved: ${viewportPath}`);
-
-        // Extract data if selectors provided
-        let extractedData = null;
-        if (pageConfig.selectors && Object.keys(pageConfig.selectors).length > 0) {
-            console.log('\n📊 Extracting data...');
-            extractedData = await extractData(page, pageConfig.selectors);
-            console.log(`✓ Data extracted (${Object.keys(extractedData).length} fields)`);
-        }
-
-        // Get page metadata
-        const metadata = await page.evaluate(() => ({
-            title: document.title,
-            url: window.location.href,
-            viewport: {
-                width: window.innerWidth,
-                height: window.innerHeight
-            },
-            documentHeight: document.body.scrollHeight
-        }));
-
-        // Save data to JSON
-        const dataPath = path.join(outputDir, 'data.json');
-        const outputData = {
-            metadata: {
-                ...metadata,
-                captureDate: new Date().toISOString(),
-                loadTime: Date.now() - startTime
-            },
-            data: extractedData
-        };
-
-        await fs.writeFile(dataPath, JSON.stringify(outputData, null, 2));
-        console.log(`✓ Data saved: ${dataPath}`);
-
-        const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
-        console.log(`\n✅ Successfully scraped ${pageConfig.name} in ${totalTime}s`);
-
-        return { success: true, time: totalTime };
-
-    } catch (error) {
-        console.error(`\n❌ Error scraping ${pageConfig.name}:`, error.message);
-        return { success: false, error: error.message };
-    } finally {
-        await page.close();
     }
+
+    // Save data to JSON
+    const dataPath = path.join(outputDir, 'data.json');
+    const outputData = {
+        metadata: {
+            ...results.metadata,
+            captureDate: new Date().toISOString(),
+            loadTime: Date.now() - startTime
+        },
+        data: results.data,
+        screenshots: {
+            desktop: results.desktop,
+            mobile: results.mobile
+        }
+    };
+
+    await fs.writeFile(dataPath, JSON.stringify(outputData, null, 2));
+    console.log(`\n✓ Data saved: ${dataPath}`);
+
+    const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`\n✅ Successfully scraped ${pageConfig.name} in ${totalTime}s`);
+
+    return { success: true, time: totalTime };
+}
+
+// Function to generate page name from URL
+function getPageNameFromUrl(url) {
+    try {
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname.replace(/^www\./, '');
+        const timestamp = Date.now();
+        return `${hostname}-${timestamp}`;
+    } catch (error) {
+        return `page-${Date.now()}`;
+    }
+}
+
+// Function to parse command line arguments
+function parseCommandLineArgs() {
+    const args = process.argv.slice(2);
+
+    if (args.length === 0) {
+        return null; // Use config file
+    }
+
+    // Filter out any flags and only keep URLs
+    const urls = args.filter(arg => {
+        try {
+            new URL(arg);
+            return true;
+        } catch {
+            return false;
+        }
+    });
+
+    if (urls.length === 0) {
+        return null;
+    }
+
+    // Create page configs from URLs
+    return urls.map(url => ({
+        name: getPageNameFromUrl(url),
+        url: url,
+        waitTime: 3000,
+        selectors: {
+            title: 'h1',
+            description: 'meta[name="description"]',
+            headings: 'h2'
+        }
+    }));
 }
 
 // Main function
@@ -268,22 +361,41 @@ async function main() {
     const startTime = Date.now();
     console.log('\n🚀 Multi-Page Web Scraper Starting...\n');
 
-    // Load configuration
-    let config;
-    try {
-        const configPath = path.join(__dirname, 'scraper-config.json');
-        const configFile = await fs.readFile(configPath, 'utf-8');
-        config = JSON.parse(configFile);
-        console.log(`✓ Configuration loaded: ${config.pages.length} page(s) to scrape\n`);
-    } catch (error) {
-        console.error('❌ Error loading configuration:', error.message);
-        process.exit(1);
+    // Try to get pages from command line arguments first
+    let pages = parseCommandLineArgs();
+    let options = {
+        headless: true,
+        maxRetries: 3,
+        screenshotFormat: 'png',
+        screenshotQuality: 90
+    };
+
+    if (!pages) {
+        // Load configuration from file
+        try {
+            const configPath = path.join(__dirname, 'scraper-config.json');
+            const configFile = await fs.readFile(configPath, 'utf-8');
+            const config = JSON.parse(configFile);
+            pages = config.pages;
+            options = { ...options, ...config.options };
+            console.log(`✓ Configuration loaded from file: ${pages.length} page(s) to scrape\n`);
+        } catch (error) {
+            console.error('❌ Error: No URLs provided and could not load configuration file.');
+            console.log('\nUsage:');
+            console.log('  node scraper-multi-page.js <url1> <url2> ...');
+            console.log('  or have a scraper-config.json file in the same directory\n');
+            console.log('Example:');
+            console.log('  node scraper-multi-page.js https://example.com https://google.com\n');
+            process.exit(1);
+        }
+    } else {
+        console.log(`✓ Processing ${pages.length} URL(s) from command line\n`);
     }
 
     // Launch browser
     console.log('🌐 Launching browser...');
     const browser = await puppeteer.launch({
-        headless: config.options.headless !== false,
+        headless: options.headless !== false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -296,21 +408,21 @@ async function main() {
     const results = [];
 
     // Process each page
-    for (let i = 0; i < config.pages.length; i++) {
-        const pageConfig = config.pages[i];
+    for (let i = 0; i < pages.length; i++) {
+        const pageConfig = pages[i];
         let attempts = 0;
         let result = null;
 
         // Retry logic
-        while (attempts < config.options.maxRetries && (!result || !result.success)) {
+        while (attempts < options.maxRetries && (!result || !result.success)) {
             if (attempts > 0) {
-                console.log(`\n🔄 Retry ${attempts}/${config.options.maxRetries - 1} for ${pageConfig.name}...\n`);
+                console.log(`\n🔄 Retry ${attempts}/${options.maxRetries - 1} for ${pageConfig.name}...\n`);
             }
 
-            result = await scrapePage(browser, pageConfig, config.options);
+            result = await scrapePage(browser, pageConfig, options);
             attempts++;
 
-            if (!result.success && attempts < config.options.maxRetries) {
+            if (!result.success && attempts < options.maxRetries) {
                 console.log(`⏳ Waiting 5 seconds before retry...\n`);
                 await new Promise(resolve => setTimeout(resolve, 5000));
             }
@@ -335,6 +447,7 @@ async function main() {
     console.log(`Pages processed: ${results.length}`);
     console.log(`Successful: ${results.filter(r => r.success).length}`);
     console.log(`Failed: ${results.filter(r => !r.success).length}`);
+    console.log(`Screenshots per page: 4 (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)`);
     console.log(`${'='.repeat(60)}\n`);
 
     results.forEach(result => {
