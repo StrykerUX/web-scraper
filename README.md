@@ -63,6 +63,7 @@ node cortana
 
 ### 📋 Datos Extraídos
 - **data.json** - Metadata, títulos, descripciones, enlaces
+- **seo-analysis.json** - Score SEO, issues, recomendaciones
 
 ## 📁 Estructura de Salida
 
@@ -78,10 +79,11 @@ output/
     ├── data.json
     ├── classes.json
     ├── css-variables.json
-    └── computed-styles.json
+    ├── computed-styles.json
+    └── seo-analysis.json
 ```
 
-**Total: 10 archivos por sitio**
+**Total: 11 archivos por sitio**
 
 ## 💾 Ejemplo de Archivos Generados
 
@@ -148,6 +150,28 @@ output/
   "main": {
     "maxWidth": "...",
     "padding": "..."
+  }
+}
+```
+
+### seo-analysis.json
+```json
+{
+  "score": 85,
+  "grade": "Good",
+  "issues": [
+    "2 images missing alt text",
+    "Meta description too long"
+  ],
+  "recommendations": [
+    "Add alt text to all images",
+    "Shorten meta description to 120-155 characters"
+  ],
+  "details": {
+    "metaTags": { "title": "...", "description": "..." },
+    "headings": { "h1Count": 1, "h2Count": 5 },
+    "images": { "total": 23, "withoutAlt": 2 },
+    "mobile": { "isMobileOptimized": true }
   }
 }
 ```

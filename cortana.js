@@ -206,6 +206,275 @@ async function extractCSSInfo(page) {
     });
 }
 
+// Function to analyze SEO
+async function analyzeSEO(page) {
+    return await page.evaluate(() => {
+        const analysis = {
+            metaTags: {},
+            headings: {},
+            images: {},
+            links: {},
+            mobile: {},
+            schema: {},
+            performance: {}
+        };
+
+        // Meta Tags Analysis
+        const title = document.querySelector('title');
+        const metaDesc = document.querySelector('meta[name="description"]');
+        const canonical = document.querySelector('link[rel="canonical"]');
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        const ogImage = document.querySelector('meta[property="og:image"]');
+        const twitterCard = document.querySelector('meta[name="twitter:card"]');
+        const viewport = document.querySelector('meta[name="viewport"]');
+
+        analysis.metaTags = {
+            title: title ? title.textContent : null,
+            titleLength: title ? title.textContent.length : 0,
+            description: metaDesc ? metaDesc.getAttribute('content') : null,
+            descriptionLength: metaDesc ? metaDesc.getAttribute('content').length : 0,
+            canonical: canonical ? canonical.getAttribute('href') : null,
+            hasOpenGraph: !!(ogTitle || ogDesc || ogImage),
+            openGraph: {
+                title: ogTitle ? ogTitle.getAttribute('content') : null,
+                description: ogDesc ? ogDesc.getAttribute('content') : null,
+                image: ogImage ? ogImage.getAttribute('content') : null
+            },
+            hasTwitterCard: !!twitterCard,
+            twitterCard: twitterCard ? twitterCard.getAttribute('content') : null,
+            favicon: document.querySelector('link[rel*="icon"]') ? true : false
+        };
+
+        // Headings Analysis
+        const h1s = document.querySelectorAll('h1');
+        const h2s = document.querySelectorAll('h2');
+        const h3s = document.querySelectorAll('h3');
+        const h4s = document.querySelectorAll('h4');
+        const h5s = document.querySelectorAll('h5');
+        const h6s = document.querySelectorAll('h6');
+
+        analysis.headings = {
+            h1Count: h1s.length,
+            h1Text: Array.from(h1s).map(h => h.textContent.trim()),
+            h2Count: h2s.length,
+            h3Count: h3s.length,
+            h4Count: h4s.length,
+            h5Count: h5s.length,
+            h6Count: h6s.length,
+            totalHeadings: h1s.length + h2s.length + h3s.length + h4s.length + h5s.length + h6s.length,
+            hasProperH1: h1s.length === 1
+        };
+
+        // Images Analysis
+        const allImages = document.querySelectorAll('img');
+        const imagesWithoutAlt = Array.from(allImages).filter(img => !img.alt || img.alt.trim() === '');
+        const modernFormats = Array.from(allImages).filter(img =>
+            img.src.includes('.webp') || img.src.includes('.avif')
+        );
+
+        analysis.images = {
+            total: allImages.length,
+            withoutAlt: imagesWithoutAlt.length,
+            withAlt: allImages.length - imagesWithoutAlt.length,
+            modernFormats: modernFormats.length,
+            altCoverage: allImages.length > 0 ?
+                Math.round(((allImages.length - imagesWithoutAlt.length) / allImages.length) * 100) : 100
+        };
+
+        // Links Analysis
+        const allLinks = document.querySelectorAll('a[href]');
+        const internalLinks = Array.from(allLinks).filter(link => {
+            const href = link.getAttribute('href');
+            return href && (href.startsWith('/') || href.includes(window.location.hostname));
+        });
+        const externalLinks = allLinks.length - internalLinks.length;
+        const linksWithoutText = Array.from(allLinks).filter(link =>
+            !link.textContent.trim() && !link.getAttribute('aria-label')
+        );
+
+        analysis.links = {
+            total: allLinks.length,
+            internal: internalLinks.length,
+            external: externalLinks,
+            withoutText: linksWithoutText.length,
+            hasDescriptiveText: linksWithoutText.length === 0
+        };
+
+        // Mobile-Friendly Analysis
+        analysis.mobile = {
+            hasViewport: !!viewport,
+            viewportContent: viewport ? viewport.getAttribute('content') : null,
+            isMobileOptimized: viewport && viewport.getAttribute('content').includes('width=device-width')
+        };
+
+        // Schema Markup Analysis
+        const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+        const schemaTypes = [];
+        jsonLdScripts.forEach(script => {
+            try {
+                const data = JSON.parse(script.textContent);
+                if (data['@type']) {
+                    schemaTypes.push(data['@type']);
+                }
+            } catch (e) {}
+        });
+
+        analysis.schema = {
+            hasStructuredData: jsonLdScripts.length > 0,
+            count: jsonLdScripts.length,
+            types: schemaTypes
+        };
+
+        // Performance Analysis
+        analysis.performance = {
+            totalImages: allImages.length,
+            totalLinks: allLinks.length,
+            totalScripts: document.querySelectorAll('script').length,
+            totalStylesheets: document.querySelectorAll('link[rel="stylesheet"]').length,
+            documentSize: document.documentElement.innerHTML.length,
+            hasLazyLoading: Array.from(allImages).some(img => img.loading === 'lazy')
+        };
+
+        return analysis;
+    });
+}
+
+// Function to calculate SEO score and generate recommendations
+function calculateSEOScore(seoData, metadata) {
+    let score = 0;
+    const issues = [];
+    const recommendations = [];
+
+    // Title (15 points)
+    if (seoData.metaTags.title) {
+        if (seoData.metaTags.titleLength >= 30 && seoData.metaTags.titleLength <= 60) {
+            score += 15;
+        } else if (seoData.metaTags.titleLength > 0) {
+            score += 8;
+            if (seoData.metaTags.titleLength < 30) {
+                issues.push('Title tag is too short (< 30 chars)');
+                recommendations.push('Expand title tag to 30-60 characters');
+            } else {
+                issues.push('Title tag is too long (> 60 chars)');
+                recommendations.push('Shorten title tag to 30-60 characters');
+            }
+        }
+    } else {
+        issues.push('Missing title tag');
+        recommendations.push('Add a descriptive title tag (30-60 chars)');
+    }
+
+    // Meta Description (15 points)
+    if (seoData.metaTags.description) {
+        if (seoData.metaTags.descriptionLength >= 120 && seoData.metaTags.descriptionLength <= 155) {
+            score += 15;
+        } else if (seoData.metaTags.descriptionLength > 0) {
+            score += 8;
+            if (seoData.metaTags.descriptionLength < 120) {
+                issues.push('Meta description is too short (< 120 chars)');
+                recommendations.push('Expand meta description to 120-155 characters');
+            } else {
+                issues.push('Meta description is too long (> 155 chars)');
+                recommendations.push('Shorten meta description to 120-155 characters');
+            }
+        }
+    } else {
+        issues.push('Missing meta description');
+        recommendations.push('Add a meta description (120-155 chars)');
+    }
+
+    // Headings (15 points)
+    if (seoData.headings.hasProperH1) {
+        score += 10;
+    } else if (seoData.headings.h1Count === 0) {
+        issues.push('Missing H1 heading');
+        recommendations.push('Add exactly one H1 heading to the page');
+    } else {
+        issues.push(`Multiple H1 headings found (${seoData.headings.h1Count})`);
+        recommendations.push('Use only one H1 heading per page');
+    }
+
+    if (seoData.headings.h2Count > 0) {
+        score += 5;
+    } else {
+        issues.push('No H2 headings found');
+        recommendations.push('Add H2 headings to structure your content');
+    }
+
+    // Images Alt Text (15 points)
+    if (seoData.images.total === 0) {
+        score += 15; // No images is fine
+    } else if (seoData.images.withoutAlt === 0) {
+        score += 15;
+    } else {
+        const percentage = (seoData.images.withAlt / seoData.images.total) * 15;
+        score += Math.round(percentage);
+        issues.push(`${seoData.images.withoutAlt} images missing alt text`);
+        recommendations.push('Add descriptive alt text to all images');
+    }
+
+    // Mobile-Friendly (10 points)
+    if (seoData.mobile.isMobileOptimized) {
+        score += 10;
+    } else if (seoData.mobile.hasViewport) {
+        score += 5;
+        issues.push('Viewport not properly configured for mobile');
+        recommendations.push('Add width=device-width to viewport meta tag');
+    } else {
+        issues.push('Missing viewport meta tag');
+        recommendations.push('Add viewport meta tag for mobile optimization');
+    }
+
+    // Open Graph (10 points)
+    if (seoData.metaTags.hasOpenGraph) {
+        score += 10;
+    } else {
+        issues.push('Missing Open Graph tags');
+        recommendations.push('Add Open Graph tags for social sharing');
+    }
+
+    // Canonical URL (5 points)
+    if (seoData.metaTags.canonical) {
+        score += 5;
+    } else {
+        issues.push('Missing canonical URL');
+        recommendations.push('Add canonical URL to avoid duplicate content issues');
+    }
+
+    // Structured Data (10 points)
+    if (seoData.schema.hasStructuredData) {
+        score += 10;
+    } else {
+        issues.push('No structured data (schema markup) found');
+        recommendations.push('Add JSON-LD structured data for rich snippets');
+    }
+
+    // Performance (5 points)
+    if (metadata.loadTime < 3000) {
+        score += 5;
+    } else if (metadata.loadTime < 5000) {
+        score += 3;
+    } else {
+        issues.push('Page load time is slow');
+        recommendations.push('Optimize page load time to under 3 seconds');
+    }
+
+    // Determine grade
+    let grade;
+    if (score >= 90) grade = 'Excellent';
+    else if (score >= 75) grade = 'Good';
+    else if (score >= 50) grade = 'Needs Improvement';
+    else grade = 'Poor';
+
+    return {
+        score: Math.min(100, score),
+        grade,
+        issues,
+        recommendations
+    };
+}
+
 // Function to capture and save page data for a specific device
 async function capturePageData(page, outputDir, deviceType) {
     const prefix = `${deviceType}-`;
@@ -338,6 +607,11 @@ async function scrapePage(browser, pageConfig, options) {
                 console.log('\n🎨 Extracting CSS information...');
                 results.cssInfo = await extractCSSInfo(page);
                 console.log(`✓ CSS info extracted (${results.cssInfo.classes.length} classes, ${Object.keys(results.cssInfo.cssVariables).length} variables)`);
+
+                // Extract SEO analysis (only once for desktop)
+                console.log('\n🔍 Analyzing SEO...');
+                results.seoData = await analyzeSEO(page);
+                console.log('✓ SEO analysis completed');
             }
 
             // Get page metadata (only once for desktop)
@@ -396,6 +670,26 @@ async function scrapePage(browser, pageConfig, options) {
         const computedStylesPath = path.join(outputDir, 'computed-styles.json');
         await fs.writeFile(computedStylesPath, JSON.stringify(results.cssInfo.computedStyles, null, 2));
         console.log('✓ computed-styles.json saved');
+    }
+
+    // seo-analysis.json
+    if (results.seoData) {
+        const seoScoring = calculateSEOScore(results.seoData, {
+            ...results.metadata,
+            loadTime: Date.now() - startTime
+        });
+
+        const seoAnalysis = {
+            score: seoScoring.score,
+            grade: seoScoring.grade,
+            issues: seoScoring.issues,
+            recommendations: seoScoring.recommendations,
+            details: results.seoData
+        };
+
+        const seoPath = path.join(outputDir, 'seo-analysis.json');
+        await fs.writeFile(seoPath, JSON.stringify(seoAnalysis, null, 2));
+        console.log(`✓ seo-analysis.json saved (Score: ${seoScoring.score}/100 - ${seoScoring.grade})`);
     }
 
     const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
@@ -545,7 +839,7 @@ async function main() {
     console.log(`\nFiles per page:`);
     console.log(`  - 4 screenshots (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)`);
     console.log(`  - 2 HTML files (page-desktop.html, page-mobile.html)`);
-    console.log(`  - 4 JSON files (data.json, classes.json, css-variables.json, computed-styles.json)`);
+    console.log(`  - 5 JSON files (data, classes, css-variables, computed-styles, seo-analysis)`);
     console.log(`${'='.repeat(60)}\n`);
 
     results.forEach(result => {
