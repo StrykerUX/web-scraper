@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const { chromium } = require('playwright');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -100,9 +100,9 @@ async function extractData(page, selectors) {
     for (const [key, selector] of Object.entries(selectors)) {
         try {
             // Check if it's a list selector (returns multiple elements)
-            const elements = await page.$$(selector);
+            const elementsCount = await page.locator(selector).count();
 
-            if (elements.length > 1) {
+            if (elementsCount > 1) {
                 // Multiple elements - extract array
                 data[key] = await page.evaluate((sel) => {
                     return Array.from(document.querySelectorAll(sel)).map(el => {
@@ -116,7 +116,7 @@ async function extractData(page, selectors) {
                         return el.textContent.trim();
                     });
                 }, selector);
-            } else if (elements.length === 1) {
+            } else if (elementsCount === 1) {
                 // Single element
                 data[key] = await page.evaluate((sel) => {
                     const el = document.querySelector(sel);
@@ -545,17 +545,19 @@ async function scrapePage(browser, pageConfig, options) {
 
         try {
             // Set viewport and user agent
-            await page.setViewport({
+            await page.setViewportSize({
                 width: viewport.width,
                 height: viewport.height
             });
-            await page.setUserAgent(viewport.userAgent);
+            await page.setExtraHTTPHeaders({
+                'User-Agent': viewport.userAgent
+            });
 
             console.log(`⏳ Navigating to page (${viewport.width}x${viewport.height})...`);
 
-            // Navigate with network idle wait
+            // Navigate with network idle wait (Playwright uses 'networkidle' instead of 'networkidle2')
             await page.goto(pageConfig.url, {
-                waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
+                waitUntil: 'networkidle',
                 timeout: 90000
             });
 
@@ -579,11 +581,11 @@ async function scrapePage(browser, pageConfig, options) {
             // Additional wait time
             const waitTime = pageConfig.waitTime || 3000;
             console.log(`⏳ Additional wait time: ${waitTime}ms...`);
-            await new Promise(resolve => setTimeout(resolve, waitTime));
+            await page.waitForTimeout(waitTime);
 
-            // Final network idle check
+            // Final network idle check (Playwright has built-in waitForLoadState)
             console.log('⏳ Final network idle check...');
-            await page.waitForNetworkIdle({ timeout: 5000 }).catch(() => {
+            await page.waitForLoadState('networkidle').catch(() => {
                 console.log('⚠ Network not completely idle, continuing anyway...');
             });
 
@@ -781,15 +783,14 @@ async function main() {
         console.log(`✓ Processing ${pages.length} URL(s) from command line\n`);
     }
 
-    // Launch browser
+    // Launch browser (Playwright)
     console.log('🌐 Launching browser...');
-    const browser = await puppeteer.launch({
+    const browser = await chromium.launch({
         headless: options.headless !== false,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-web-security'
+            '--disable-dev-shm-usage'
         ]
     });
     console.log('✓ Browser launched\n');
