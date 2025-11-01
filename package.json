@@ -1,17 +1,17 @@
 {
   "name": "play",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.5.0",
+  "description": "CORTANA Web Scanner",
+  "main": "cortana.js",
   "scripts": {
     "scrape": "node cortana.js",
     "weapon": "node weapon.js",
     "scrape:puppeteer": "node scraper-puppeteer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["scraper", "web-scanner"],
+  "author": "StrykerUX",
+  "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "dotenv": "^17.2.3",

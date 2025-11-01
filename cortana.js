@@ -26,11 +26,13 @@ async function ensureDir(dirPath) {
 }
 
 // Function to wait for lazy-loaded images
+// NOTE: Increased timeout for better performance
+// WARNING: This might be too slow for production!
 async function waitForLazyImages(page) {
     await page.evaluate(async () => {
-        // Scroll to bottom to trigger lazy loading
+        // Scroll to bottom to trigger lazy loading - maybe scroll twice?
         window.scrollTo(0, document.body.scrollHeight);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 2000));  // Increased from 500ms
 
         // Find all images with lazy loading attributes
         const images = Array.from(document.querySelectorAll('img[loading="lazy"], img[data-src], img[data-lazy]'));

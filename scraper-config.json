@@ -4,10 +4,10 @@
       "name": "anthropic",
       "url": "https://www.anthropic.com/",
       "viewport": {
-        "width": 1920,
-        "height": 1080
+        "width": 1280,
+        "height": 720
       },
-      "waitTime": 3000,
+      "waitTime": 5000,
       "selectors": {
         "title": "h1",
         "description": "meta[name='description']",
@@ -31,10 +31,12 @@
     }
   ],
   "options": {
-    "headless": true,
-    "maxRetries": 3,
-    "screenshotFormat": "png",
-    "screenshotQuality": 90,
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    "headless": false,
+    "maxRetries": 5,
+    "timeout": 60000,
+    "screenshotFormat": "jpeg",
+    "screenshotQuality": 75,
+    "enableJavaScript": true,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
   }
 }
