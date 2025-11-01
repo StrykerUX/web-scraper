@@ -1,4 +1,4 @@
-# 🎮 CORTANA - Web Intelligence Scanner
+# 🎮 CORTANA - WEB INTELLIGENCE SCANNER
 
 Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión.
 
