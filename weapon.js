@@ -320,6 +320,125 @@ async function extractResources(page) {
     });
 }
 
+// Function to capture slider/carousel states (WEAPON EXCLUSIVE)
+async function captureSliderStates(page, outputDir, sliderInfo) {
+    const screenshots = [];
+
+    try {
+        // Scroll back to top to find slider
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.waitForTimeout(500);
+
+        // Find next button and dots
+        const nextButtonSelectors = [
+            'button[aria-label*="next" i]',
+            '.slider-next',
+            '.slick-next',
+            '.w-slider-arrow-right',
+            '[class*="next"]',
+            '[class*="arrow-right"]'
+        ];
+
+        const dotsSelectors = [
+            '.w-slider-dot',
+            '.slick-dots button',
+            '.carousel-dot',
+            '[class*="dot"]',
+            '[class*="pagination"] button'
+        ];
+
+        let nextButton = null;
+        let dots = [];
+
+        // Try to find next button
+        for (const selector of nextButtonSelectors) {
+            try {
+                const btn = page.locator(selector).first();
+                if (await btn.isVisible({ timeout: 2000 })) {
+                    nextButton = btn;
+                    break;
+                }
+            } catch (e) {
+                // Try next selector
+            }
+        }
+
+        // Try to find dots
+        for (const selector of dotsSelectors) {
+            try {
+                const dotElements = await page.locator(selector).all();
+                if (dotElements.length > 0) {
+                    dots = dotElements;
+                    break;
+                }
+            } catch (e) {
+                // Try next selector
+            }
+        }
+
+        const slidesToCapture = Math.min(sliderInfo.slidesToCapture || 3, 6);
+        console.log(`   Capturing ${slidesToCapture} slider states...`);
+
+        for (let i = 0; i < slidesToCapture; i++) {
+            // Navigate to slide
+            if (dots.length > i) {
+                // Use dots if available
+                try {
+                    await dots[i].click({ timeout: 1500 });
+                    console.log(`   ✓ Clicked dot ${i + 1}`);
+                } catch (e) {
+                    console.log(`   ⚠ Could not click dot ${i + 1}, using next button`);
+                    if (nextButton && i > 0) {
+                        await nextButton.click({ timeout: 1500 }).catch(() => {});
+                    }
+                }
+            } else if (nextButton && i > 0) {
+                // Use next button
+                try {
+                    await nextButton.click({ timeout: 1500 });
+                    console.log(`   ✓ Clicked next button (state ${i + 1})`);
+                } catch (e) {
+                    console.log(`   ⚠ Could not click next button for state ${i + 1}`);
+                }
+            }
+
+            // Wait for transition
+            await page.waitForTimeout(900);
+
+            // Pause animations
+            await pauseAnimations(page);
+
+            // Take screenshot
+            const screenshotPath = path.join(outputDir, `slider-slide-${i + 1}.png`);
+            await page.screenshot({
+                path: screenshotPath,
+                fullPage: false,
+                type: 'png'
+            });
+
+            screenshots.push({
+                slideNumber: i + 1,
+                path: screenshotPath,
+                fileName: `slider-slide-${i + 1}.png`
+            });
+
+            console.log(`   📸 Slide ${i + 1} captured`);
+
+            // Resume animations
+            await resumeAnimations(page);
+
+            await page.waitForTimeout(250);
+        }
+
+        console.log(`✓ Captured ${screenshots.length} slider screenshots`);
+        return screenshots;
+
+    } catch (error) {
+        console.error(`⚠ Error capturing slider states: ${error.message}`);
+        return screenshots; // Return whatever we captured
+    }
+}
+
 // Function to extract data based on selectors
 async function extractData(page, selectors) {
     if (!selectors || Object.keys(selectors).length === 0) {
@@ -884,6 +1003,10 @@ async function scrapePage(browser, pageConfig, options) {
                 results.sliderInfo = await detectSliders(page);
                 if (results.sliderInfo.found) {
                     console.log(`✓ Slider detected (${results.sliderInfo.slidesToCapture} states available)`);
+
+                    // WEAPON EXCLUSIVE: Capture slider states
+                    console.log('\n📸 Capturing slider states (WEAPON EXCLUSIVE)...');
+                    results.sliderScreenshots = await captureSliderStates(page, outputDir, results.sliderInfo);
                 } else {
                     console.log('✓ No sliders detected');
                 }
@@ -994,6 +1117,13 @@ async function scrapePage(browser, pageConfig, options) {
         console.log(`✓ slider-info.json saved`);
     }
 
+    // slider-screenshots.json (WEAPON EXCLUSIVE - only if captured)
+    if (results.sliderScreenshots && results.sliderScreenshots.length > 0) {
+        const sliderScreenshotsPath = path.join(outputDir, 'slider-screenshots.json');
+        await fs.writeFile(sliderScreenshotsPath, JSON.stringify(results.sliderScreenshots, null, 2));
+        console.log(`✓ slider-screenshots.json saved (${results.sliderScreenshots.length} slides captured)`);
+    }
+
     const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(`\n✅ Successfully scraped ${pageConfig.name} in ${totalTime}s`);
 
@@ -1050,7 +1180,8 @@ function parseCommandLineArgs() {
 // Main function
 async function main() {
     const startTime = Date.now();
-    console.log('\n🎮 CORTANA - Web Intelligence Scanner\n');
+    console.log('\n🔫 WEAPON - Advanced Web Intelligence Scanner\n');
+    console.log('   Enhanced with Slider Multi-Capture\n');
 
     // Try to get pages from command line arguments first
     let pages = parseCommandLineArgs();
@@ -1073,10 +1204,10 @@ async function main() {
         } catch (error) {
             console.error('❌ Error: No URLs provided and could not load configuration file.');
             console.log('\n💡 Usage:');
-            console.log('  node cortana <url1> <url2> ...');
+            console.log('  node weapon <url1> <url2> ...');
             console.log('  or have a scraper-config.json file in the same directory\n');
             console.log('📝 Example:');
-            console.log('  node cortana https://example.com https://google.com\n');
+            console.log('  node weapon https://example.com https://google.com\n');
             process.exit(1);
         }
     } else {
@@ -1139,9 +1270,11 @@ async function main() {
     console.log(`Failed: ${results.filter(r => !r.success).length}`);
     console.log(`\nFiles per page:`);
     console.log(`  - 4 screenshots (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)`);
+    console.log(`  - 3-6 slider screenshots* (slider-slide-1.png, slider-slide-2.png, etc.)`);
     console.log(`  - 2 HTML files (page-desktop.html, page-mobile.html)`);
-    console.log(`  - 8+ JSON files (data, classes, css-variables, computed-styles, seo-analysis, tech-stack, resources, slider-info*)`);
-    console.log(`    * slider-info only if carousel/slider detected`);
+    console.log(`  - 8-9 JSON files (data, classes, css-variables, computed-styles, seo-analysis, tech-stack, resources, slider-info*, slider-screenshots*)`);
+    console.log(`    * slider files only if carousel/slider detected`);
+    console.log(`    Total: 14-21 files per site (depending on sliders)`);
     console.log(`${'='.repeat(60)}\n`);
 
     results.forEach(result => {
@@ -1154,7 +1287,7 @@ async function main() {
         }
     });
 
-    console.log('\n✅ Mission complete. Cortana out.\n');
+    console.log('\n✅ Mission complete. Weapon secured.\n');
 }
 
 // Run the scraper
