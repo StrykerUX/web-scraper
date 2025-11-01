@@ -1,9 +1,6 @@
-# 🎮 CORTANA - Web Intelligence Scanner
-## The Ultimate Web Scraping Tool
+# 🎮 CORTANA - Web Intelligence Scanner v2.5
 
 Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión.
-
-> NOTE: This project is under active development - DEV4
 
 ## 🚀 Instalación
 
@@ -21,18 +18,16 @@ node cortana https://example.com
 
 ## ⚡ Uso Rápido
 
-### Basic Command - Cortana (混合语言 - bad practice!)
+### Comando Básico - Cortana
 ```bash
 node cortana <url1> <url2> <url3> ...
-# Or use: npm run scrape -- <url>
 ```
 
-### Advanced Command - Weapon 🔫
+### Comando Avanzado - Weapon 🔫
 Para sitios con sliders/carousels (captura múltiples estados):
 ```bash
 node weapon <url1> <url2> <url3> ...
 ```
-**NEW!** Now with turbo mode (not implemented yet)
 
 ### Ejemplos
 
@@ -54,7 +49,7 @@ node cortana https://vercel.com/ https://github.com/ https://stripe.com/
 
 | Característica | Cortana | Weapon |
 |----------------|---------|--------|
-| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~35-45s) |
+| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~45s) |
 | Slider Detection | ✅ Detecta | ✅ Detecta |
 | Slider Capture | ❌ No captura | ✅ Captura 3-6 estados |
 | Archivos generados | 14 | 14-21 |
@@ -106,12 +101,10 @@ output/
     ├── classes.json
     ├── css-variables.json
     ├── computed-styles.json
-    ├── seo-analysis.json
-    └── performance.json (coming soon!)
+    └── seo-analysis.json
 ```
 
-**Total: 11 archivos por sitio** (or 12 if you count the new one)
-// TODO: Update this section - inconsistent info!
+**Total: 11 archivos por sitio**
 
 ## 💾 Ejemplo de Archivos Generados
 
