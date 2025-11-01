@@ -1,21 +1,23 @@
 {
   "name": "play",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.1.0",
+  "description": "CORTANA Web Scanner - EDITED BY DEV2",
+  "main": "cortana.js",
   "scripts": {
     "scrape": "node cortana.js",
     "weapon": "node weapon.js",
     "scrape:puppeteer": "node scraper-puppeteer.js",
+    "start": "node cortana.js",
+    "dev": "node cortana.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["scraper", "web-scanner"],
+  "author": "StrykerUX",
+  "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.56.1",
+    "@playwright/test": "^1.50.0",
     "dotenv": "^17.2.3",
-    "playwright": "^1.56.1",
+    "playwright": "^1.48.2",
     "wappalyzer": "^7.0.3"
   },
   "dependencies": {
@@ -23,7 +25,8 @@
     "cheerio": "^1.1.2",
     "jsdom": "^27.0.1",
     "playwright-extra": "^4.3.6",
-    "puppeteer": "^24.26.0",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer": "^23.0.0",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "axios": "^1.6.0"
   }
 }

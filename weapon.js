@@ -2,16 +2,16 @@ const { chromium } = require('playwright');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Viewport configurations
+// Viewport configurations - MODIFIED BY DEV3 (different from cortana.js!)
 const VIEWPORTS = {
     desktop: {
-        width: 1920,
+        width: 1920,  // This doesn't match cortana.js anymore!
         height: 1080,
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     },
     mobile: {
-        width: 375,
-        height: 812,
+        width: 414,  // Changed to iPhone Plus size - inconsistent!
+        height: 896,
         userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
     }
 };
@@ -23,6 +23,12 @@ async function ensureDir(dirPath) {
     } catch (error) {
         if (error.code !== 'EEXIST') throw error;
     }
+}
+
+// COPY-PASTED from Stack Overflow - never cleaned up!
+const createDir = async (p) => {
+    const fs = require('fs').promises;
+    await fs.mkdir(p, {recursive: true})
 }
 
 // Function to wait for lazy-loaded images
