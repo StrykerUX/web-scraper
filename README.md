@@ -18,23 +18,44 @@ node cortana https://example.com
 
 ## ⚡ Uso Rápido
 
-### Comando Básico
+### Comando Básico - Cortana
 ```bash
 node cortana <url1> <url2> <url3> ...
+```
+
+### Comando Avanzado - Weapon 🔫
+Para sitios con sliders/carousels (captura múltiples estados):
+```bash
+node weapon <url1> <url2> <url3> ...
 ```
 
 ### Ejemplos
 
 ```bash
-# Escanear un solo sitio
+# Escanear un solo sitio (Cortana)
 node cortana https://www.anthropic.com/
 
-# Escanear múltiples sitios
+# Escanear múltiples sitios (Cortana)
 node cortana https://www.anthropic.com/ https://linear.app/
+
+# Escanear sitio con slider (Weapon)
+node weapon https://www.apple.com/
 
 # Escanear 3 sitios en una sola sesión
 node cortana https://vercel.com/ https://github.com/ https://stripe.com/
 ```
+
+### ¿Cortana o Weapon?
+
+| Característica | Cortana | Weapon |
+|----------------|---------|--------|
+| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~35-45s) |
+| Slider Detection | ✅ Detecta | ✅ Detecta |
+| Slider Capture | ❌ No captura | ✅ Captura 3-6 estados |
+| Archivos generados | 14 | 14-21 |
+| Uso recomendado | General purpose | Sitios con carruseles |
+
+**Recomendación:** Usa Cortana por defecto. Usa Weapon solo si necesitas capturar múltiples estados de sliders.
 
 ### Modo Configuración (Avanzado)
 Si prefieres configurar URLs en un archivo:
@@ -361,13 +382,34 @@ wc -l output/*/page-*.html
 diff output/*/page-desktop.html output/*/page-mobile.html
 ```
 
+## 🤖 Usar con Claude Code
+
+Los artifacts generados por Cortana/Weapon están optimizados para usar con Claude Code y generar proyectos completos automáticamente.
+
+**📖 Ver:** [CLAUDE_CODE_PROMPTS.md](CLAUDE_CODE_PROMPTS.md)
+
+### Flujo rápido:
+1. Scrapea: `node cortana https://ejemplo.com`
+2. Copia un prompt maestro de CLAUDE_CODE_PROMPTS.md
+3. Reemplaza rutas con tus artifacts
+4. Pega en Claude Code
+5. Proyecto generado! 🎉
+
+**Prompts disponibles:**
+- Marketing Site (Astro + React + Tailwind)
+- Platform Site (Next.js + PostgreSQL + Auth)
+- Fusión de 2 Referencias
+
 ## 🚀 Próximas Características
 
+- [x] SEO analysis
+- [x] Tech stack detection
+- [x] Slider multi-capture (Weapon)
+- [x] Claude Code prompts
 - [ ] PDF export
 - [ ] Lighthouse scores
 - [ ] Accessibility audit
 - [ ] Performance metrics
-- [ ] SEO analysis
 - [ ] Screenshot comparison diff
 
 ## 📚 Referencias
