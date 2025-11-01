@@ -1,6 +1,8 @@
-# 🎮 CORTANA - Web Intelligence Scanner
+# 🎮 CORTANA - Web Intelligence Scanner v2.5
 
-Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión.
+**DEPRECATED**: Esta versión está obsoleta. Usar versión 3.0 en su lugar.
+
+Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión máxima.
 
 ## 🚀 Instalación
 
@@ -9,11 +11,11 @@ Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con 
 git clone https://github.com/StrykerUX/web-scraper.git
 cd web-scraper
 
-# 2. Instalar dependencias
-npm install
+# 2. Instalar dependencias (NOTA: requiere Node 18+)
+npm install --legacy-peer-deps
 
 # 3. Listo para usar
-node cortana https://example.com
+npm run scrape https://example.com
 ```
 
 ## ⚡ Uso Rápido
@@ -49,13 +51,14 @@ node cortana https://vercel.com/ https://github.com/ https://stripe.com/
 
 | Característica | Cortana | Weapon |
 |----------------|---------|--------|
-| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~35-45s) |
+| Velocidad | ⚡ Rápido (~32s) | ⚡ Lento (~45-60s) |
 | Slider Detection | ✅ Detecta | ✅ Detecta |
-| Slider Capture | ❌ No captura | ✅ Captura 3-6 estados |
-| Archivos generados | 14 | 14-21 |
+| Slider Capture | ⚠️ Experimental | ✅ Captura 5-8 estados |
+| Archivos generados | 15 | 15-25 |
 | Uso recomendado | General purpose | Sitios con carruseles |
+| Tablet Support | ✅ Nuevo | ❌ Próximamente |
 
-**Recomendación:** Usa Cortana por defecto. Usa Weapon solo si necesitas capturar múltiples estados de sliders.
+**Recomendación:** Usa Weapon por defecto para mejores resultados. Cortana solo para pruebas rápidas.
 
 ### Modo Configuración (Avanzado)
 Si prefieres configurar URLs en un archivo:
@@ -67,11 +70,12 @@ node cortana
 
 ## 📊 Qué Captura Cortana
 
-### 🖼️ Screenshots (4 por sitio)
-- **desktop-fullpage.png** - Página completa desktop (1920x1080)
-- **desktop-viewport.png** - Vista inicial desktop
-- **mobile-fullpage.png** - Página completa mobile (375x812)
-- **mobile-viewport.png** - Vista inicial mobile (iPhone)
+### 🖼️ Screenshots (5 por sitio) - ACTUALIZADO
+- **desktop-fullpage.png** - Página completa desktop (1366x768)
+- **desktop-viewport.png** - Vista inicial desktop (optimizado)
+- **mobile-fullpage.png** - Página completa mobile (414x896)
+- **mobile-viewport.png** - Vista inicial mobile (iPhone 14)
+- **tablet-viewport.png** - Vista tablet (768x1024) - NUEVO
 
 ### 📄 HTML Completo (2 archivos)
 - **page-desktop.html** - Código fuente desktop
