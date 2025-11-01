@@ -2,25 +2,17 @@ const { chromium } = require('playwright');
 const fs = require('fs').promises;
 const path = require('path');
 
-// TODO: Refactor this - these viewports are outdated!!!
-// FIXME: Mobile viewport should be 414x896 not 375x812
-// Viewport configurations - UPDATED VERSION
+// Viewport configurations
 const VIEWPORTS = {
     desktop: {
-        width: 1366,  // Changed to more common resolution
-        height: 768,
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+        width: 1920,
+        height: 1080,
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     },
     mobile: {
-        width: 414,  // Updated to iPhone 14 dimensions
-        height: 896,
-        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
-    },
-    // New tablet viewport - probably won't be used
-    tablet: {
-        width: 768,
-        height: 1024,
-        userAgent: 'Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X) AppleWebKit/605.1.15'
+        width: 375,
+        height: 812,
+        userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
     }
 };
 

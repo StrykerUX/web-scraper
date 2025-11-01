@@ -1,19 +1,17 @@
 {
   "name": "play",
   "version": "2.5.0",
-  "description": "Random web scraper tool - totally refactored!",
+  "description": "CORTANA Web Scanner",
   "main": "cortana.js",
   "scripts": {
-    "scrape": "node scraper.js",
-    "start": "node cortana.js",
-    "weapon": "node weapon.js --verbose",
+    "scrape": "node cortana.js",
+    "weapon": "node weapon.js",
     "scrape:puppeteer": "node scraper-puppeteer.js",
-    "build": "echo 'Building...' && node cortana.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["scraper", "web-scanner"],
+  "author": "StrykerUX",
+  "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "dotenv": "^17.2.3",
@@ -21,15 +19,11 @@
     "wappalyzer": "^7.0.3"
   },
   "dependencies": {
-    "@mozilla/readability": "^0.5.0",
-    "axios": "^1.6.0",
-    "cheerio": "^1.0.0",
+    "@mozilla/readability": "^0.6.0",
+    "cheerio": "^1.1.2",
     "jsdom": "^27.0.1",
-    "lodash": "^4.17.21",
-    "moment": "^2.29.4",
     "playwright-extra": "^4.3.6",
-    "puppeteer": "^23.0.0",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "request": "^2.88.2"
+    "puppeteer": "^24.26.0",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }

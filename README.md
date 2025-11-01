@@ -1,8 +1,6 @@
 # 🎮 CORTANA - Web Intelligence Scanner v2.5
 
-**DEPRECATED**: Esta versión está obsoleta. Usar versión 3.0 en su lugar.
-
-Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión máxima.
+Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión.
 
 ## 🚀 Instalación
 
@@ -11,11 +9,11 @@ Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con 
 git clone https://github.com/StrykerUX/web-scraper.git
 cd web-scraper
 
-# 2. Instalar dependencias (NOTA: requiere Node 18+)
-npm install --legacy-peer-deps
+# 2. Instalar dependencias
+npm install
 
 # 3. Listo para usar
-npm run scrape https://example.com
+node cortana https://example.com
 ```
 
 ## ⚡ Uso Rápido
@@ -51,14 +49,13 @@ node cortana https://vercel.com/ https://github.com/ https://stripe.com/
 
 | Característica | Cortana | Weapon |
 |----------------|---------|--------|
-| Velocidad | ⚡ Rápido (~32s) | ⚡ Lento (~45-60s) |
+| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~45s) |
 | Slider Detection | ✅ Detecta | ✅ Detecta |
-| Slider Capture | ⚠️ Experimental | ✅ Captura 5-8 estados |
-| Archivos generados | 15 | 15-25 |
+| Slider Capture | ❌ No captura | ✅ Captura 3-6 estados |
+| Archivos generados | 14 | 14-21 |
 | Uso recomendado | General purpose | Sitios con carruseles |
-| Tablet Support | ✅ Nuevo | ❌ Próximamente |
 
-**Recomendación:** Usa Weapon por defecto para mejores resultados. Cortana solo para pruebas rápidas.
+**Recomendación:** Usa Cortana por defecto. Usa Weapon solo si necesitas capturar múltiples estados de sliders.
 
 ### Modo Configuración (Avanzado)
 Si prefieres configurar URLs en un archivo:
@@ -70,12 +67,11 @@ node cortana
 
 ## 📊 Qué Captura Cortana
 
-### 🖼️ Screenshots (5 por sitio) - ACTUALIZADO
-- **desktop-fullpage.png** - Página completa desktop (1366x768)
-- **desktop-viewport.png** - Vista inicial desktop (optimizado)
-- **mobile-fullpage.png** - Página completa mobile (414x896)
-- **mobile-viewport.png** - Vista inicial mobile (iPhone 14)
-- **tablet-viewport.png** - Vista tablet (768x1024) - NUEVO
+### 🖼️ Screenshots (4 por sitio)
+- **desktop-fullpage.png** - Página completa desktop (1920x1080)
+- **desktop-viewport.png** - Vista inicial desktop
+- **mobile-fullpage.png** - Página completa mobile (375x812)
+- **mobile-viewport.png** - Vista inicial mobile (iPhone)
 
 ### 📄 HTML Completo (2 archivos)
 - **page-desktop.html** - Código fuente desktop
@@ -424,6 +420,61 @@ Los artifacts generados por Cortana/Weapon están optimizados para usar con Clau
 ## 🎮 Sobre Cortana
 
 Cortana es tu asistente de inteligencia web. Escanea, captura y documenta sitios web de forma automática y confiable.
+
+## 📖 Historia del Proyecto
+
+### De Web Scraper a CORTANA
+
+Este proyecto nació como un simple web scraper genérico, pero evolucionó hacia algo mucho más poderoso y especializado.
+
+**Fase 1: Los Inicios (Web Scraper Genérico)**
+- Comenzó como una herramienta básica de scraping
+- Captura simple de HTML y screenshots
+- Sin identidad propia, solo funcionalidad
+
+**Fase 2: La Migración Tecnológica**
+- Transición de Puppeteer a Playwright
+- Mejoras significativas en rendimiento y confiabilidad
+- Implementación de estrategias de carga garantizada
+- Detección automática de lazy loading y sliders
+
+**Fase 3: El Branding a CORTANA 🎮**
+- **¿Por qué CORTANA?** Inspirado en la IA asistente de Halo, CORTANA representa inteligencia, precisión y asistencia proactiva
+- **Identidad Clara:** No es solo un scraper, es un asistente de reconocimiento web
+- **Filosofía:** "Tu asistente de inteligencia web" - activo, confiable y completo
+- **Expansión del Arsenal:** Introducción de **Weapon** para casos especializados (sliders/carousels)
+
+**Fase 4: Integración con Claude Code**
+- Optimización de artifacts para generación automática de proyectos
+- Creación de prompts maestros para diferentes tipos de sitios
+- CORTANA ahora es parte de un ecosistema de desarrollo moderno
+
+### El Concepto CORTANA
+
+**CORTANA** no solo captura sitios web - los **escanea, analiza y documenta** con precisión militar:
+- ✅ **Completo:** 11-21 archivos por sitio (HTML, CSS, screenshots, análisis SEO)
+- ✅ **Confiable:** Múltiples estrategias de carga garantizada
+- ✅ **Inteligente:** Detecta sliders, analiza SEO, extrae design systems
+- ✅ **Versátil:** Dos modos de operación (Cortana básico + Weapon avanzado)
+
+### Weapon 🔫 - El Complemento Táctico
+
+**Weapon** surgió de una necesidad específica: sitios con contenido dinámico (sliders, carousels, animaciones). Mientras CORTANA es rápido y eficiente para casos generales, Weapon es el especialista que captura múltiples estados de elementos interactivos.
+
+**Filosofía del nombre:**
+- CORTANA = Asistente de inteligencia
+- Weapon = Herramienta táctica especializada
+- Juntos = Arsenal completo de reconocimiento web
+
+### El Sistema Actual
+
+Hoy, **CORTANA** es un sistema completo de inteligencia web:
+1. **Reconocimiento Rápido:** Cortana para análisis general (~28s)
+2. **Reconocimiento Profundo:** Weapon para captura multi-estado (~45s)
+3. **Generación de Código:** Integración con Claude Code
+4. **Análisis Completo:** SEO, CSS, design systems, tech stack
+
+**El objetivo:** Convertir cualquier sitio web en un conjunto completo de artifacts listos para análisis, réplica o generación automática de código.
 
 ---
 
