@@ -20,10 +20,12 @@
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
+    "axios": "^1.13.2",
     "cheerio": "^1.1.2",
     "jsdom": "^27.0.1",
     "playwright-extra": "^4.3.6",
-    "puppeteer": "^24.26.0",
+    "puppeteer": "^24.29.1",
+    "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
