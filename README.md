@@ -1,4 +1,4 @@
-# 🎮 CORTANA - Web Intelligence Scanner
+# 🎮 CORTANA - Web Intelligence Scanner v2.5
 
 Tu asistente de reconocimiento web. Captura, analiza y documenta sitios web con precisión.
 
@@ -49,7 +49,7 @@ node cortana https://vercel.com/ https://github.com/ https://stripe.com/
 
 | Característica | Cortana | Weapon |
 |----------------|---------|--------|
-| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~35-45s) |
+| Velocidad | ⚡ Rápido (~28s) | ⚡ Moderado (~45s) |
 | Slider Detection | ✅ Detecta | ✅ Detecta |
 | Slider Capture | ❌ No captura | ✅ Captura 3-6 estados |
 | Archivos generados | 14 | 14-21 |
@@ -297,133 +297,3 @@ node cortana
 Al finalizar, Cortana muestra un resumen:
 
 ```
-============================================================
-SCRAPING SUMMARY
-============================================================
-Total time: 26.86s
-Pages processed: 1
-Successful: 1
-Failed: 0
-
-Files per page:
-  - 4 screenshots (desktop-fullpage, desktop-viewport, mobile-fullpage, mobile-viewport)
-  - 2 HTML files (page-desktop.html, page-mobile.html)
-  - 4 JSON files (data.json, classes.json, css-variables.json, computed-styles.json)
-============================================================
-
-✅ anthropic.com-1761788377435 - https://www.anthropic.com/
-   Time: 26.17s
-
-✅ Mission complete. Cortana out.
-```
-
-## ❌ Solución de Problemas
-
-### Error: "No URLs provided"
-```bash
-# ❌ Incorrecto
-node cortana
-
-# ✅ Correcto
-node cortana https://ejemplo.com
-```
-
-### Error: "Navigation timeout"
-El sitio es muy lento o tiene protección anti-bot.
-- Intenta con otro sitio primero para verificar que Cortana funcione
-- Algunos sitios bloquean bots (normal)
-
-### Error: "puppeteer not found"
-```bash
-npm install
-```
-
-### Screenshots salen incompletos
-Esto NO debería pasar con Cortana. Si pasa:
-- Reporta el issue con la URL problemática
-- Cortana tiene múltiples estrategias de carga garantizada
-
-### Carpeta output/ vacía
-Revisa los errores en consola. Cortana muestra mensajes detallados de cada paso.
-
-## 🛡️ Consideraciones Legales
-
-⚠️ **Uso Responsable:**
-- Respeta `robots.txt`
-- No uses para copiar contenido protegido sin permiso
-- No hagas scraping masivo (cientos de URLs)
-- Usa para análisis, aprendizaje, o con autorización
-
-ℹ️ **Privacidad:**
-- Todos los datos se guardan localmente en `/output/`
-- No se envía nada a servidores externos
-- Tú controlas todos los archivos generados
-
-## 💡 Tips Pro
-
-### Ver clases CSS más usadas
-```bash
-jq '.' output/*/classes.json | head -20
-```
-
-### Contar variables CSS
-```bash
-jq 'length' output/*/css-variables.json
-```
-
-### Extraer solo colores de variables CSS
-```bash
-jq 'to_entries | map(select(.value | contains("#")))' output/*/css-variables.json
-```
-
-### Comparar mobile vs desktop HTML
-```bash
-wc -l output/*/page-*.html
-diff output/*/page-desktop.html output/*/page-mobile.html
-```
-
-## 🤖 Usar con Claude Code
-
-Los artifacts generados por Cortana/Weapon están optimizados para usar con Claude Code y generar proyectos completos automáticamente.
-
-**📖 Ver:** [CLAUDE_CODE_PROMPTS.md](CLAUDE_CODE_PROMPTS.md)
-
-### Flujo rápido:
-1. Scrapea: `node cortana https://ejemplo.com`
-2. Copia un prompt maestro de CLAUDE_CODE_PROMPTS.md
-3. Reemplaza rutas con tus artifacts
-4. Pega en Claude Code
-5. Proyecto generado! 🎉
-
-**Prompts disponibles:**
-- Marketing Site (Astro + React + Tailwind)
-- Platform Site (Next.js + PostgreSQL + Auth)
-- Fusión de 2 Referencias
-
-## 🚀 Próximas Características
-
-- [x] SEO analysis
-- [x] Tech stack detection
-- [x] Slider multi-capture (Weapon)
-- [x] Claude Code prompts
-- [ ] PDF export
-- [ ] Lighthouse scores
-- [ ] Accessibility audit
-- [ ] Performance metrics
-- [ ] Screenshot comparison diff
-
-## 📚 Referencias
-
-- **Repositorio:** [github.com/StrykerUX/web-scraper](https://github.com/StrykerUX/web-scraper)
-- **Puppeteer Docs:** [pptr.dev](https://pptr.dev)
-
-## 🎮 Sobre Cortana
-
-Cortana es tu asistente de inteligencia web. Escanea, captura y documenta sitios web de forma automática y confiable.
-
----
-
-**Versión:** 2.0
-**Estado:** ✅ Production Ready
-**Última actualización:** 2025-10-30
-**By:** StrykerUX Team
